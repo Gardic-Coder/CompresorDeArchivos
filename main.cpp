@@ -43,7 +43,7 @@ int main() {
 				switch(ui.getCursor()) {
 					case 0: {
 						try {
-							filename = ui.solicitarDato("Ingrese el nombre del archivo a comprimir: ");
+							filename = ui.solicitarDato("Ingrese el nombre del archivo a comprimir: ") + ".txt";
 							content = fh.readFile(filename);
 							hm.processData(content);
 							fh.writeCompressedFile(filename + ".huf", hm.getCompressedData());
