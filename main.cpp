@@ -42,10 +42,14 @@ int main() {
 			case MenuUI::ENTER: {
 				switch(ui.getCursor()) {
 					case 0: {
-						filename = ui.solicitarDato("Ingrese el nombre del archivo a comprimir: ");
-						content = fh.readFile(filename);
-						hm.processData(content);
-						fh.writeCompressedFile(filename + ".huf", hm.getCompressedData());
+						try {
+							filename = ui.solicitarDato("Ingrese el nombre del archivo a comprimir: ");
+							content = fh.readFile(filename);
+							hm.processData(content);
+							fh.writeCompressedFile(filename + ".huf", hm.getCompressedData());
+						} catch(const std::exception& e) {
+							cerr << "Error: " << e.what() << endl;
+						}
 						break;
 					}
 					case 1: {

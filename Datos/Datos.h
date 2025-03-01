@@ -2,6 +2,7 @@
 #pragma once
 #include <utf8.h>
 #include <string>
+#include <algorithm>
 #include <fstream>
 #include <stdexcept>
 #include <utf8.h>

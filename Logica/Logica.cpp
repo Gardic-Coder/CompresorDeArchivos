@@ -147,6 +147,7 @@ void HuffmanManager::treeToString(HuffmanNode* node, int depth, std::vector<std:
         switch(node->code_point) {
             case U' ':  utf8_char = "[Espacio]"; break;
             case U'\n': utf8_char = "[Salto]";   break;
+            case U'\r': utf8_char = "[Retorno]"; break;
             case U'\t': utf8_char = "[Tab]";     break;
             default:
                 if (node->code_point <= 0x1F || node->code_point == 0x7F) { // Caracteres de control
