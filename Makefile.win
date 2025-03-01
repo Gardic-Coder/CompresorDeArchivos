@@ -1,0 +1,37 @@
+# Project: CompresorDeArchivos
+# Makefile created by Embarcadero Dev-C++ 6.3
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+OBJ      = main.o Datos/Datos.o Logica/Logica.o Presentacion/Presentacion.o
+LINKOBJ  = main.o Datos/Datos.o Logica/Logica.o Presentacion/Presentacion.o
+LIBS     = -L"D:/Dev-Cpp/TDM-GCC-64/lib" -L"D:/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/lib" -static-libgcc -LD:/curl-win64/curl-8.11.1_3-win64-mingw/lib -lcurl
+INCS     = -I"D:/Dev-Cpp/TDM-GCC-64/include" -I"D:/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"D:/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include"
+CXXINCS  = -I"D:/Dev-Cpp/TDM-GCC-64/include" -I"D:/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"D:/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include" -I"D:/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/c++"
+BIN      = CompresorDeArchivos.exe
+CXXFLAGS = $(CXXINCS) -finput-charset=UTF-8 -fexec-charset=UTF-8
+CFLAGS   = $(INCS) -finput-charset=UTF-8 -fexec-charset=UTF-8
+DEL      = D:\Dev-Cpp\devcpp.exe INTERNAL_DEL
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${DEL} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+main.o: main.cpp
+	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
+
+Datos/Datos.o: Datos/Datos.cpp
+	$(CPP) -c Datos/Datos.cpp -o Datos/Datos.o $(CXXFLAGS)
+
+Logica/Logica.o: Logica/Logica.cpp
+	$(CPP) -c Logica/Logica.cpp -o Logica/Logica.o $(CXXFLAGS)
+
+Presentacion/Presentacion.o: Presentacion/Presentacion.cpp
+	$(CPP) -c Presentacion/Presentacion.cpp -o Presentacion/Presentacion.o $(CXXFLAGS)
