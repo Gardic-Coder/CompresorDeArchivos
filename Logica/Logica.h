@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <cctype>
 #include <bitset>
+#include <cwctype> // Para iswprint
 #include <utf8.h>
 
 using namespace std;

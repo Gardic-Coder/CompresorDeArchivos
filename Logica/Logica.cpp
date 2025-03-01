@@ -146,6 +146,43 @@ void HuffmanManager::treeToString(HuffmanNode* node, int depth, std::vector<std:
         // Manejar caracteres especiales
         switch(node->code_point) {
             case U' ':  utf8_char = "[Espacio]"; break;
+            case U'\n': utf8_char = "[Salto]";   break;
+            case U'\t': utf8_char = "[Tab]";     break;
+            default:
+                if (node->code_point <= 0x1F || node->code_point == 0x7F) { // Caracteres de control
+                    std::stringstream hex;
+                    hex << "[U+" << std::hex << std::setw(4) << std::setfill('0') 
+                        << node->code_point << "]";
+                    utf8_char = hex.str();
+                } else {
+                    utf8_char = "'" + utf8_char + "'"; // Mostrar caracter directamente
+                }
+        }
+        
+        ss << utf8_char << " (" << node->freq << ")";
+    }
+
+    result.push_back(ss.str());
+    treeToString(node->left, depth + 1, result);
+    treeToString(node->right, depth + 1, result);
+}
+
+/*void HuffmanManager::treeToString(HuffmanNode* node, int depth, std::vector<std::string>& result) const {
+    if (!node) return;
+
+    std::stringstream ss;
+    std::string indent(depth * 4, ' ');
+    
+    if (node->left || node->right) {
+        ss << indent << "|-- [" << node->freq << "]";
+    } else {
+        ss << indent << "|-- ";
+        std::string utf8_char;
+        utf8::append(node->code_point, std::back_inserter(utf8_char));
+        
+        // Manejar caracteres especiales
+        switch(node->code_point) {
+            case U' ':  utf8_char = "[Espacio]"; break;
             case U'\n': utf8_char = "[Salto]";    break;
             case U'\t': utf8_char = "[Tab]";     break;
             default:
@@ -165,7 +202,7 @@ void HuffmanManager::treeToString(HuffmanNode* node, int depth, std::vector<std:
     result.push_back(ss.str());
     treeToString(node->left, depth + 1, result);
     treeToString(node->right, depth + 1, result);
-}
+}*/
 
 /*void HuffmanManager::treeToString(HuffmanNode* node, int depth, vector<string>& result) const {
     if (!node) return;
