@@ -8,7 +8,7 @@ using namespace std;
 
 int main() {
 	bool salir = false;
-	MenuUI ui("220", "123", "15", "+");
+	MenuUI ui("124", "57", "159", "=");
 	FileHandler fh;
 	HuffmanManager hm;
 	vector<string> opcionesMenu = {"Ingresar archivo para comprimir", "Mostrar Estadisticas de ocurrencia",

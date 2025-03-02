@@ -1,3 +1,15 @@
-La casa de la colina está llena de misterios y secretos.
-Hola mundo.
-Estas son las mañanitas.
+¡Hola a todos!
+
+Este es un ejemplo de texto con diferentes tipos de caracteres:
+- Caracteres con acentos: á, é, í, ó, ú
+- Caracteres con diéresis: ü
+- Caracteres especiales: ñ, ¿, ¡
+
+Ahora, vamos a ver cómo se utilizan los saltos de línea y las tabulaciones.
+
+Primera línea.
+    Segunda línea (con tabulación).
+        Tercera línea (con doble tabulación).
+
+¿Entiendes cómo funcionan?
+¡Espero que te sea útil!
