@@ -69,7 +69,8 @@ public:
     void displayTree(const vector<string>& tree);
     void displayCodeTable(const map<uint32_t, string>& codes);
     void displayCompressionResults(size_t original, size_t compressed, double ratio);
-    
+    string getBaseFilename(const string& filename);
+    bool hasExtension(const string& filename, const string& extension);
 
 private:
     int ancho; // Ancho de la ventana.

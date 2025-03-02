@@ -292,23 +292,6 @@ void MenuUI::displayTree(const vector<string>& treeLines) {
     cout << MOSTRAR;
 }
 
-/*void MenuUI::displayTree(const vector<string>& treeLines) {
-	system("cls");
-	centradoVertical(treeLines.size() + 5);
-	separador();
-	mostrarCentrado("=== ARBOL HUFFMAN ===");
-	cout << endl;
-
-	for (const auto& line : treeLines) {
-		cout << OCULTAR;
-		mostrarCentrado(line);
-		cout << endl;
-	}
-
-	separador();
-	cout << MOSTRAR;
-}*/
-
 void MenuUI::displayCodeTable(const map<uint32_t, string>& codes) {
 	system("cls");
 	centradoVertical(codes.size() + 5);
@@ -364,4 +347,16 @@ void MenuUI::displayCompressionResults(size_t original, size_t compressed, doubl
 
 	separador();
 	cout << MOSTRAR;
+}
+
+string MenuUI::getBaseFilename(const string& filename) {
+    size_t lastDot = filename.find_last_of(".");
+    if (lastDot == string::npos) return filename; // No hay extensión
+    return filename.substr(0, lastDot);
+}
+
+bool MenuUI::hasExtension(const string& filename, const string& extension) {
+    if (filename.length() < extension.length()) return false;
+    return filename.compare(filename.length() - extension.length(), 
+                          extension.length(), extension) == 0;
 }

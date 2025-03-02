@@ -100,7 +100,7 @@ map<uint32_t, string> HuffmanManager::getCodeTable() const {
 
 vector<string> HuffmanManager::getTreeStructure() const {
 	vector<string> treeLines;
-	treeToString(root, 0, treeLines);
+	treeToString(root, 0, treeLines, true, "");
 	return treeLines;
 }
 
@@ -130,7 +130,63 @@ void HuffmanManager::deleteTree(HuffmanNode* node) {
 	}
 }
 
-void HuffmanManager::treeToString(HuffmanNode* node, int depth, std::vector<std::string>& result) const {
+void HuffmanManager::treeToString(HuffmanNode* node, int depth, 
+                                 vector<string>& result, bool isLast, string prefix) const {
+    //bool isLast = true;
+    //string prefix = "";
+    if (!node) return;
+
+    stringstream ss;
+    ss << prefix;
+    ss << (isLast ? "└── " : "├── ");
+
+    string utf8_char;
+    if (node->code_point != 0) {
+        utf8::append(node->code_point, back_inserter(utf8_char));
+        
+        // Manejar caracteres especiales
+        switch(node->code_point) {
+            case U' ':  utf8_char = "[Espacio]"; break;
+            case U'\n': utf8_char = "[Salto]";   break;
+            case U'\t': utf8_char = "[Tab]";     break;
+            default:
+            	/*if (node->code_point <= 0x1F || node->code_point == 0x7F) { // Caracteres de control
+                    std::stringstream hex;
+                    hex << "[U+" << std::hex << std::setw(4) << std::setfill('0') 
+                        << node->code_point << "]";
+                    utf8_char = hex.str();
+                } else {
+                    utf8_char = "'" + utf8_char + "'"; // Mostrar caracter directamente
+                }*/
+                if (node->code_point <= 0x1F || node->code_point == 0x7F) {
+                    stringstream hex;
+                    hex << "[U+" << std::hex << setw(4) << setfill('0') 
+                        << node->code_point << "]";
+                    utf8_char = hex.str();
+                } else {
+                    utf8_char = "'" + utf8_char + "'";
+                }
+        }
+    } else {
+        utf8_char = "[" + to_string(node->freq) + "]";
+    }
+
+    ss << utf8_char << " (" << node->freq << ")";
+    result.push_back(ss.str());
+
+    // Nuevo prefijo para los hijos
+    string newPrefix = prefix + (isLast ? "    " : "│   ");
+
+    // Recorrer hijos
+    if (node->left) {
+        treeToString(node->left, depth + 1, result, !node->right, newPrefix);
+    }
+    if (node->right) {
+        treeToString(node->right, depth + 1, result, true, newPrefix);
+    }
+}
+
+/*void HuffmanManager::treeToString(HuffmanNode* node, int depth, std::vector<std::string>& result) const {
     if (!node) return;
 
     std::stringstream ss;
@@ -166,121 +222,53 @@ void HuffmanManager::treeToString(HuffmanNode* node, int depth, std::vector<std:
     result.push_back(ss.str());
     treeToString(node->left, depth + 1, result);
     treeToString(node->right, depth + 1, result);
+}*/
+
+// Descompresion.
+string HuffmanManager::decompress(const map<uint32_t, string>& codes, 
+                                      const string& compressedData) {
+    // Reconstruir árbol
+    root = rebuildTree(codes);
+    
+    // Decodificar datos
+    string decompressed;
+    HuffmanNode* current = root;
+    
+    for (char byte : compressedData) {
+        for (int i = 7; i >= 0; --i) {
+            int bit = (byte >> i) & 1;
+            current = bit ? current->right : current->left;
+            
+            if (!current->left && !current->right) {
+                string utf8_char;
+                utf8::append(current->code_point, back_inserter(utf8_char));
+                decompressed += utf8_char;
+                current = root;
+            }
+        }
+    }
+    
+    return decompressed;
 }
 
-/*void HuffmanManager::treeToString(HuffmanNode* node, int depth, std::vector<std::string>& result) const {
-    if (!node) return;
-
-    std::stringstream ss;
-    std::string indent(depth * 4, ' ');
+HuffmanNode* HuffmanManager::rebuildTree(const map<uint32_t, string>& codes) {
+    HuffmanNode* root = new HuffmanNode(0, 0);
     
-    if (node->left || node->right) {
-        ss << indent << "|-- [" << node->freq << "]";
-    } else {
-        ss << indent << "|-- ";
-        std::string utf8_char;
-        utf8::append(node->code_point, std::back_inserter(utf8_char));
+    for (const auto& [cp, code] : codes) {
+        HuffmanNode* current = root;
         
-        // Manejar caracteres especiales
-        switch(node->code_point) {
-            case U' ':  utf8_char = "[Espacio]"; break;
-            case U'\n': utf8_char = "[Salto]";    break;
-            case U'\t': utf8_char = "[Tab]";     break;
-            default:
-                if (!isprint(static_cast<unsigned char>(utf8_char[0]))) {
-                    std::stringstream hex;
-                    hex << "[0x" << std::hex << std::setw(4) << std::setfill('0') 
-                        << node->code_point << "]";
-                    utf8_char = hex.str();
-                } else {
-                    utf8_char = "'" + utf8_char + "'";
-                }
+        for (char bit : code) {
+            if (bit == '0') {
+                if (!current->left) current->left = new HuffmanNode(0, 0);
+                current = current->left;
+            } else {
+                if (!current->right) current->right = new HuffmanNode(0, 0);
+                current = current->right;
+            }
         }
         
-        ss << utf8_char << " (" << node->freq << ")";
+        current->code_point = cp;
     }
-
-    result.push_back(ss.str());
-    treeToString(node->left, depth + 1, result);
-    treeToString(node->right, depth + 1, result);
-}*/
-
-/*void HuffmanManager::treeToString(HuffmanNode* node, int depth, vector<string>& result) const {
-    if (!node) return;
-
-    stringstream ss;
-    string indent(depth * 4, ' ');
-
-    if (node->left || node->right) {
-        ss << indent << "|-- [" << node->freq << "]";
-    } else {
-        ss << indent << "|-- ";
-        
-        // Convertir code_point a UTF-8
-        string utf8_char;
-        utf8::append(node->code_point, back_inserter(utf8_char));
-        
-        // Manejar caracteres especiales
-        switch(node->code_point) {
-            case U' ':  utf8_char = "[Espacio]"; break;
-            case U'\n': utf8_char = "[Salto]";   break;
-            case U'\t': utf8_char = "[Tab]";     break;
-            case U'\r': utf8_char = "[Retorno]";  break;
-            default:
-                if (!iswprint(node->code_point)) {  // Usar funcion wide para Unicode
-                    stringstream hex;
-                    hex << "[U+" << hex << setw(4) << setfill('0') 
-                        << node->code_point << "]";
-                    utf8_char = hex.str();
-                }
-        }
-        
-        ss << utf8_char << " (" << node->freq << ")";
-    }
-
-    result.push_back(ss.str());
-    treeToString(node->left, depth + 1, result);
-    treeToString(node->right, depth + 1, result);
-}*/
-
-/*void HuffmanManager::treeToString(HuffmanNode* node, int depth, vector<string>& result) const {
-    if (!node) return;
-
-    stringstream ss;
-    string indent(depth * 4, ' ');
-    unsigned char uc = static_cast<unsigned char>(node->code_point);
-
-    if (node->left || node->right) {
-        ss << indent << "|-- [" << node->freq << "]";
-    } else {
-        ss << indent << "|-- ";
-
-        // Caracteres especiales con nombre
-        if (uc == ' ') {
-            ss << "[Espacio]";
-        } else if (uc == '\n') {
-            ss << "[Salto de Linea]";
-        } else if (uc == '\t') {
-            ss << "[Tabulador]";
-        }
-        // Caracteres extendidos (ISO-8859-1/Latin1)
-        else if (uc >= 0xA0 && uc <= 0xFF) { // Rango de caracteres extendidos
-            ss << "'" << node->code_point << "'";
-        }
-        // Caracteres no imprimibles
-        else if (!isprint(uc)) {
-            ss << "[0x" << hex << setw(2) << setfill('0')
-               << static_cast<int>(uc) << dec << "]";
-        }
-        // Caracteres normales
-        else {
-            ss << "'" << node->code_point << "'";
-        }
-
-        ss << " (" << node->freq << ")";
-    }
-
-    result.push_back(ss.str());
-    treeToString(node->left, depth + 1, result);
-    treeToString(node->right, depth + 1, result);
-}*/
+    
+    return root;
+}

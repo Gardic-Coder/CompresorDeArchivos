@@ -12,13 +12,16 @@ int main() {
 	FileHandler fh;
 	HuffmanManager hm;
 	vector<string> opcionesMenu = {"Ingresar archivo para comprimir", "Mostrar Estadisticas de ocurrencia",
-	                               "Mostrar Arbol", "Mostrar Tabla de Codigos", "Mostrar Comparacion", "Salir"
+	                               "Mostrar Arbol", "Mostrar Tabla de Codigos", "Mostrar Comparacion", "Descomprimir Archivo",
+	                               "Salir"
 	                              };
 	string filename;
 	string content;
-	
+	string inputFilename;
+	string baseName;
+
 	SetConsoleCP(65001);
-    SetConsoleOutputCP(65001);
+	SetConsoleOutputCP(65001);
 	ui.setCursor(0);
 
 	while(!salir) {
@@ -43,13 +46,25 @@ int main() {
 				switch(ui.getCursor()) {
 					case 0: {
 						try {
-							filename = ui.solicitarDato("Ingrese el nombre del archivo a comprimir: ") + ".txt";
-							content = fh.readFile(filename);
+							inputFilename = ui.solicitarDato("Ingrese el nombre del archivo a comprimir: ");
+							baseName = ui.getBaseFilename(inputFilename);
+
+							if (!ui.hasExtension(inputFilename, ".txt")) {
+								inputFilename += ".txt";
+							}
+
+							content = fh.readFile(inputFilename);
 							hm.processData(content);
-							fh.writeCompressedFile(filename + ".huf", hm.getCompressedData());
+
+							string outputFilename = baseName + ".huf";
+							fh.writeCompressedFile(outputFilename, hm.getCompressedData(), hm.getCodeTable());
+
+							ui.mostrarCentrado("Archivo comprimido exitosamente como: " + outputFilename);
 						} catch(const std::exception& e) {
-							cerr << "Error: " << e.what() << endl;
+							//cerr << "Error: " << e.what() << endl;
+							ui.mostrarCentrado("Error: " + string(e.what()));
 						}
+						getch();
 						break;
 					}
 					case 1: {
@@ -73,6 +88,29 @@ int main() {
 						break;
 					}
 					case 5: {
+						try {
+							inputFilename = ui.solicitarDato("Ingrese el nombre del archivo comprimido: ");
+							baseName = ui.getBaseFilename(inputFilename);
+							
+							if (!ui.hasExtension(inputFilename, ".huf")) {
+								inputFilename += ".huf";
+							}
+							
+							auto [codes, compressedData] = fh.readCompressedFile(inputFilename);
+
+							string decompressed = hm.decompress(codes, compressedData);
+
+							string outputFilename = baseName + "_descomprimido.txt";
+							fh.writeFile(outputFilename, decompressed);
+
+							ui.mostrarCentrado("Archivo descomprimido exitosamente como: " + outputFilename);
+						} catch (const exception& e) {
+							ui.mostrarCentrado("Error: " + string(e.what()));
+						}
+						getch();
+						break;
+					}
+					case 6: {
 						if(ui.confirmacion("¿Estas seguro que deseas salir?")) {
 							ui.mostrarCentrado("Saliendo del menu...");
 							salir = !salir;
@@ -91,26 +129,5 @@ int main() {
 			}
 		}
 	}
-
-	/*try {
-
-
-		string filename = ui.solicitarDato("Ingrese el nombre del archivo a comprimir: ");
-		string content = fh.readFile(filename);
-
-		hm.processData(content);
-
-		ui.displayStatistics(hm.getFrequencyStats());
-		ui.displayTree(hm.getTreeStructure());
-		ui.displayCodeTable(hm.getCodeTable());
-		ui.displayCompressionResults(hm.getOriginalSize(), hm.getCompressedSize(), hm.getCompressionRatio());
-
-		// Escribir archivo comprimido
-		fh.writeCompressedFile(filename + ".huf", hm.getCompressedData());
-
-	} catch(const std::exception& e) {
-		cerr << "Error: " << e.what() << endl;
-		return 1;
-	}*/
 	return 0;
 }

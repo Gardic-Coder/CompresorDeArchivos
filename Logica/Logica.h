@@ -15,14 +15,15 @@
 
 using namespace std;
 
+struct HuffmanNode {
+    uint32_t code_point;  // Punto de código Unicode
+    unsigned freq;
+    HuffmanNode *left, *right;
+    HuffmanNode(uint32_t cp, unsigned f) : code_point(cp), freq(f), left(nullptr), right(nullptr) {}
+};
+
 class HuffmanManager {
 public:
-    struct HuffmanNode {
-        uint32_t code_point;  // Punto de codigo Unicode
-        unsigned freq;
-        HuffmanNode *left, *right;
-        HuffmanNode(uint32_t cp, unsigned f) : code_point(cp), freq(f), left(nullptr), right(nullptr) {}
-    };
 
     HuffmanManager();
     ~HuffmanManager();
@@ -38,6 +39,9 @@ public:
     size_t getOriginalSize() const;
     size_t getCompressedSize() const;
     double getCompressionRatio() const;
+    
+    string decompress(const map<uint32_t, string>& codes, const string& compressedData);
+    HuffmanNode* rebuildTree(const map<uint32_t, string>& codes);
 
 private:
     HuffmanNode* root;
@@ -50,7 +54,9 @@ private:
     void buildTree(const string& content);
     void generateCodes();
     void deleteTree(HuffmanNode* node);
-    void treeToString(HuffmanNode* node, int depth, vector<string>& result) const;
+    //void treeToString(HuffmanNode* node, int depth, vector<string>& result) const;
+    void treeToString(HuffmanNode* node, int depth, vector<string>& result, bool isLast, string prefix) const;
+    //void treeToString(HuffmanNode* node, int depth, vector<string>& result, bool isLast = true, string prefix = "") const;
     void generateCompressedData(const string& content);
     
     struct Compare {
